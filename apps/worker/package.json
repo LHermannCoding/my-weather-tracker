@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch --env-file=.env.local src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "build": "echo 'no build needed'",
+    "start": "npx tsx src/index.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.103.0"
+    "@supabase/supabase-js": "^2.103.0",
+    "tsx": "^4.19.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.0",
     "typescript": "^5.5.0",
     "@types/node": "^20"
   }

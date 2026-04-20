@@ -2,10 +2,10 @@ FROM node:20-slim
 
 WORKDIR /app
 
-COPY apps/worker/package.json apps/worker/package-lock.json* ./
+COPY apps/worker/package.json ./
 RUN npm install
 
-COPY apps/worker/ ./
-RUN npm run build
+COPY apps/worker/src ./src
+COPY apps/worker/tsconfig.json ./
 
-CMD ["node", "dist/index.js"]
+CMD ["npx", "tsx", "src/index.ts"]
