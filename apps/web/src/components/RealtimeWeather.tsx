@@ -27,6 +27,7 @@ export function RealtimeWeather() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"favorites" | "all">("favorites");
+  const [search, setSearch] = useState("");
 
   // Load cities and weather data
   useEffect(() => {
@@ -136,14 +137,31 @@ export function RealtimeWeather() {
     );
   }
 
-  const displayedCities =
+  const filteredByTab =
     filter === "favorites"
       ? cities.filter((c) => favorites.has(c.id))
       : cities;
 
+  const displayedCities = search
+    ? filteredByTab.filter(
+        (c) =>
+          c.name.toLowerCase().includes(search.toLowerCase()) ||
+          c.country.toLowerCase().includes(search.toLowerCase())
+      )
+    : filteredByTab;
+
   return (
     <div>
-      {/* Filter tabs */}
+      {/* Search and filter */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <input
+          type="text"
+          placeholder="Search cities..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 sm:w-64"
+        />
+      </div>
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setFilter("favorites")}
