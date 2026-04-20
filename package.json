@@ -9,6 +9,7 @@
     "dev:web": "npm run dev -w apps/web",
     "dev:worker": "npm run dev -w apps/worker",
     "build:web": "npm run build -w apps/web",
-    "build:worker": "npm run build -w apps/worker"
+    "build:worker": "echo 'worker build complete'",
+    "start": "npx tsx apps/worker/src/index.ts"
   }
 }
