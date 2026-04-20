@@ -75,7 +75,7 @@ async function poll() {
   // 2. Fetch weather for each city and upsert (with delay to avoid rate limits)
   let successCount = 0;
   for (const city of cities as City[]) {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 5000));
     const weather = await fetchWeather(city);
     if (!weather) continue;
 

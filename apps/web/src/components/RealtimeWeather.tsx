@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { WeatherCard } from "./WeatherCard";
+import { AddCityForm } from "./AddCityForm";
 
 interface City {
   id: string;
@@ -29,39 +30,33 @@ export function RealtimeWeather() {
   const [filter, setFilter] = useState<"favorites" | "all">("favorites");
   const [search, setSearch] = useState("");
 
+  const refreshCities = useCallback(async () => {
+    const sb = getSupabase();
+    const [citiesRes, weatherRes, favsRes] = await Promise.all([
+      sb.from("cities").select("*").order("name"),
+      sb.from("weather_data").select("*"),
+      fetch("/api/favorites"),
+    ]);
+
+    if (citiesRes.data) setCities(citiesRes.data);
+    if (weatherRes.data) {
+      const map: Record<string, WeatherRow> = {};
+      for (const w of weatherRes.data) {
+        map[w.city_id] = w;
+      }
+      setWeatherMap(map);
+    }
+    if (favsRes.ok) {
+      const ids: string[] = await favsRes.json();
+      setFavorites(new Set(ids));
+    }
+    setLoading(false);
+  }, []);
+
   // Load cities and weather data
   useEffect(() => {
-    async function load() {
-      const sb = getSupabase();
-      const [citiesRes, weatherRes] = await Promise.all([
-        sb.from("cities").select("*").order("name"),
-        sb.from("weather_data").select("*"),
-      ]);
-
-      if (citiesRes.data) setCities(citiesRes.data);
-      if (weatherRes.data) {
-        const map: Record<string, WeatherRow> = {};
-        for (const w of weatherRes.data) {
-          map[w.city_id] = w;
-        }
-        setWeatherMap(map);
-      }
-      setLoading(false);
-    }
-    load();
-  }, []);
-
-  // Load favorites
-  useEffect(() => {
-    async function loadFavorites() {
-      const res = await fetch("/api/favorites");
-      if (res.ok) {
-        const ids: string[] = await res.json();
-        setFavorites(new Set(ids));
-      }
-    }
-    loadFavorites();
-  }, []);
+    refreshCities();
+  }, [refreshCities]);
 
   // Subscribe to Realtime weather updates
   useEffect(() => {
@@ -183,6 +178,7 @@ export function RealtimeWeather() {
         >
           All Cities ({cities.length})
         </button>
+        <AddCityForm onCityAdded={refreshCities} />
       </div>
 
       {/* Weather grid */}
